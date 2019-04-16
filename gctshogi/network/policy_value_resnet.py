@@ -13,10 +13,9 @@ import shogi
 
 from gctshogi.common import *
 
-# RES_BLOCKS = 18
-RES_BLOCKS = 5
-FILTERS = 192
-FCL_UNITS = 192
+RES_BLOCKS = 18
+FILTERS = 256
+FCL_UNITS = 256
 
 def conv_layer(inputs,
                filters,
@@ -66,7 +65,7 @@ class PolicyValueResnet():
         ph = Flatten(name='policy_head')(ph)
 
         # value network
-        # layer13
+        # layer40
         vh = conv_layer(x, filters=1, kernel_size=1)
         vh = Flatten()(vh)
         vh = Dense(FCL_UNITS, activation='relu', kernel_initializer='he_normal')(vh)
