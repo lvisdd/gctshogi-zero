@@ -114,3 +114,59 @@ def read_kifu_from_hcpe(hcpe_path, split_num=0):
         positions.append((piece_bb, occupied, pieces_in_hand, move_label, win))
         
     return positions
+
+# read kifu
+def read_kifu_from_csa(kifu_list_file, split_num=0):
+    positions = []
+    # cdef line, move
+    with open(kifu_list_file, 'r') as f:
+        lines=f.readlines()
+        
+        if split_num==1:
+            n = len(lines) // 2
+            lines = lines[:n]
+        elif split_num==2:
+            n = len(lines) // 2
+            lines = lines[n:]
+        else:
+            pass
+        # print(lines)
+        
+        # for line in f.readlines():
+        for line in lines:
+            filepath = line.rstrip('\r\n')
+            # kifu = shogi.CSA.Parser.parse_file(filepath)[0]
+            try:
+                # print(filepath)
+                with open(filepath, encoding="utf-8") as f:
+                    kifu = shogi.CSA.Parser.parse_str(f.read())[0]
+                    # print(kifu)
+                    win_color = shogi.BLACK if kifu['win'] == 'b' else shogi.WHITE
+                    board = shogi.Board()
+                    for move in kifu['moves']:
+                        if board.turn == shogi.BLACK:
+                            # piece_bb = copy.deepcopy(board.piece_bb)
+                            # occupied = copy.deepcopy((board.occupied[shogi.BLACK], board.occupied[shogi.WHITE]))
+                            # pieces_in_hand = copy.deepcopy((board.pieces_in_hand[shogi.BLACK], board.pieces_in_hand[shogi.WHITE]))
+                            piece_bb = cPickle.loads(pickle.dumps(board.piece_bb))
+                            occupied = cPickle.loads(pickle.dumps((board.occupied[shogi.BLACK], board.occupied[shogi.WHITE])))
+                            pieces_in_hand = cPickle.loads(pickle.dumps((board.pieces_in_hand[shogi.BLACK], board.pieces_in_hand[shogi.WHITE])))
+                            
+                        else:
+                            piece_bb = [bb_rotate_180(bb) for bb in board.piece_bb]
+                            occupied = (bb_rotate_180(board.occupied[shogi.WHITE]), bb_rotate_180(board.occupied[shogi.BLACK]))
+                            # pieces_in_hand = copy.deepcopy((board.pieces_in_hand[shogi.WHITE], board.pieces_in_hand[shogi.BLACK]))
+                            pieces_in_hand = cPickle.loads(pickle.dumps((board.pieces_in_hand[shogi.WHITE], board.pieces_in_hand[shogi.BLACK])))
+                        
+                        # move label
+                        move_label = make_output_label(shogi.Move.from_usi(move), board.turn)
+                        
+                        # result
+                        win = 1 if win_color == board.turn else 0
+                        
+                        positions.append((piece_bb, occupied, pieces_in_hand, move_label, win))
+                        board.push_usi(move)
+            except Exception as e:
+                print(e)
+                print("skip -> " + filepath)
+    return positions
