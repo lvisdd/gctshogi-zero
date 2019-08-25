@@ -68,10 +68,10 @@ def compile(model, lr, weight_decay):
                   metrics={'policy_head': categorical_accuracy, 'value_head': binary_accuracy})
 
 def train(positions_train, positions_test, model, batchsize, steps, test_steps, window_size):
-    model.fit_generator(datagen(positions_train), steps,
-              validation_data=datagen(positions_test), validation_steps=test_steps)
-    # model.fit_generator(datagen(positions_train), int(len(positions_train) / batchsize),
-    #           validation_data=datagen(positions_test), validation_steps=int(len(positions_test) / batchsize))
+    # model.fit_generator(datagen(positions_train), steps,
+    #           validation_data=datagen(positions_test), validation_steps=test_steps)
+    model.fit_generator(datagen(positions_train), int(len(positions_train) / batchsize),
+              validation_data=datagen(positions_test), validation_steps=int(len(positions_test) / batchsize))
 
 if __name__ == '__main__':
     import argparse

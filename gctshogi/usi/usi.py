@@ -16,7 +16,15 @@
             moves = cmd[1].split(' ')
             player.position(moves)
         elif cmd[0] == 'go':
-            player.go()
+            # print(len(cmd))
+            commands = cmd[1].split(' ') if len(cmd) > 1 else []
+            player.go(commands)
+        elif cmd[0] == 'ponderhit':
+            player.ponderhit()
+            # commands = []
+            # player.go(commands)
+        elif cmd[0] == 'stop':
+            player.stop()
         elif cmd[0] == 'quit':
             player.quit()
             break

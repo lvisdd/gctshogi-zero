@@ -186,7 +186,7 @@ class MCTSPlayer(BasePlayer):
         if __debug__:
             print(self.board)
     
-    def go(self):
+    def go(self, commands):
         if self.board.is_game_over():
             print('bestmove resign')
             return
@@ -214,6 +214,7 @@ class MCTSPlayer(BasePlayer):
         child_move = current_node.child_move
         if child_num == 1:
             # print('bestmove', move_to_usi(child_move[0]).decode())
+            # print('bestmove ' + child_move[0].usi())
             print('bestmove', child_move[0])
             return
 
@@ -258,6 +259,7 @@ class MCTSPlayer(BasePlayer):
                         # result = 1 - child_node.value_win
                     update_result(current_node, next_index, result)
                     result = -result
+                    # result = 1 - result
 
             # 探索を打ち切るか確認
             if self.interruption_check():
@@ -315,6 +317,7 @@ class MCTSPlayer(BasePlayer):
             cp, bestmove.usi()))
 
         print('bestmove', bestmove.usi())
+        # print('bestmove ' + bestmove.usi())
 
     # 局面の評価
     def eval_node(self):
@@ -451,26 +454,6 @@ class MCTSPlayer(BasePlayer):
         else:
             return False
 
-    # 王手をかけているか確認
-    def is_checking(self):
-        return self.board.is_attacked_by(self.board.turn, self.board.king_squares[self.board.turn ^ 1])
-
-    # 千日手チェック
-    def is_draw(self):
-        if self.board.is_fourfold_repetition:
-            if self.board.is_check():
-                # 連続王手の千日手
-                return REPETITION_WIN
-            elif self.is_checking():
-                # 連続王手の千日手
-                return REPETITION_LOSE
-            else:
-                # 千日手
-                return REPETITION_DRAW
-        else:
-            # 千日手ではない
-            return NOT_REPETITION
-
     # UCT探索
     def uct_search(self, current_node, depth, trajectories):
         # 詰みのチェック
@@ -480,14 +463,16 @@ class MCTSPlayer(BasePlayer):
         # 千日手チェック
         if self.repetitions[-1] == 4:
             # draw = self.board.is_draw()
-            draw = self.is_draw()
-            if draw == REPETITION_WIN:
-                # 連続王手の千日手
-                return -1.0
-            elif draw == REPETITION_LOSE:
-                # 連続王手の千日手
-                return 1.0
-            else:
+            # if draw == REPETITION_WIN:
+            #     # 連続王手の千日手
+            #     return -1.0
+            # elif draw == REPETITION_LOSE:
+            #     # 連続王手の千日手
+            #     return 1.0
+            # else:
+            #     # 千日手
+            #     return 0.0
+            if self.board.is_fourfold_repetition:
                 # 千日手
                 return 0.0
 
@@ -522,16 +507,18 @@ class MCTSPlayer(BasePlayer):
                 result = 1.0 # 反転して値を返すため1を設定
             elif self.repetitions[-1] == 4:
                 # draw = self.board.is_draw()
-                draw = self.is_draw()
-                if draw == REPETITION_WIN:
-                    # 連続王手の千日手
-                    result = -1.0
-                elif draw == REPETITION_LOSE:
-                    # 連続王手の千日手
-                    result = 1.0
-                else:
+                # if draw == REPETITION_WIN:
+                #     # 連続王手の千日手
+                #     result = -1.0
+                # elif draw == REPETITION_LOSE:
+                #     # 連続王手の千日手
+                #     result = 1.0
+                # else:
+                #     # 千日手
+                #     result = 0.0
+                if self.board.is_fourfold_repetition:
                     # 千日手
-                    result = 0.0
+                    return 0.0
             else:
                 # ノードをキューに追加
                 self.queuing_node(self.board, self.moves, self.repetitions, child_node)
@@ -555,3 +542,4 @@ class MCTSPlayer(BasePlayer):
         update_result(current_node, next_index, result)
 
         return -result
+        # return 1 - result

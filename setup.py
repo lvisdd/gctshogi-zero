@@ -1,6 +1,5 @@
 ﻿import setuptools
 from setuptools import setup, Extension
-import numpy
 
 setuptools.setup(
     name = 'gctshogi-zero',
