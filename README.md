@@ -102,7 +102,7 @@ python ./train_from_csa.py kifulist_train.txt kifulist_test.txt ./model/model-20
 python ./train_from_csa.py kifulist_train.txt kifulist_test.txt ./model/model-2017.h5 --batchsize 1024 --use_tpu --resume ./model/model-2016.h5
 ```
 
-## Keras -> Tensorflowモデルの保存する場合
+## Kerasモデル -> Tensorflowモデルを保存する場合
 
 ```
 python convert_model_k2tf.py -r ./model/model-2016.h5 model
