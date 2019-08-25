@@ -86,28 +86,26 @@ python ./utils/prepare_kifu_list.py C:/work/gctshogi-zero/data/floodgate/2016 ki
 
 ``` dos
 ### GPU
-python train_policy_value_resnet.py --batchsize 32 --epoch 1 --log log kifulist_train.txt kifulist_test.txt
+python ./train.py kifulist_train.txt kifulist_test.txt ./model/model-2016.h5 --batchsize 256
 
 ### TPU
-python train_policy_value_resnet.py --use_tpu --batchsize 32 --epoch 1 --log log kifulist_train.txt kifulist_test.txt
-
--> ./model/model_policy_value_resnet-best.hdf5
+python ./train.py kifulist_train.txt kifulist_test.txt ./model/model-2016.h5 --batchsize 1024 --use_tpu
 ```
 
 ## 学習の継続
 
 ``` dos
 ### GPU
-python train_policy_value_resnet.py --batchsize 32 --epoch 1 --log log --resume ./model/model_policy_value_resnet-best.hdf5 kifulist_train.txt kifulist_test.txt
+python ./train_from_csa.py kifulist_train.txt kifulist_test.txt ./model/model-2017.h5 --batchsize 256 --resume ./model/model-2016.h5
 
 ### TPU
-python train_policy_value_resnet.py --use_tpu --batchsize 32 --epoch 1 --log log --resume ./model/model_policy_value_resnet-best.hdf5 kifulist_train.txt kifulist_test.txt
+python ./train_from_csa.py kifulist_train.txt kifulist_test.txt ./model/model-2017.h5 --batchsize 1024 --use_tpu --resume ./model/model-2016.h5
 ```
 
-## Keras -> Tensorflowモデルの保存
+## Keras -> Tensorflowモデルの保存する場合
 
 ```
-python convert_model_k2tf.py -r ./model/model.h5 model
+python convert_model_k2tf.py -r ./model/model-2016.h5 model
 
 -> model\1556503437
    * assets
