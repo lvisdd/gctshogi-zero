@@ -69,8 +69,8 @@ def compile(model, lr, weight_decay):
         if isinstance(layer, tf.keras.layers.Conv2D) or isinstance(layer, tf.keras.layers.Dense):
             layer.add_loss(tf.keras.regularizers.l2(weight_decay)(layer.kernel))
 
-    # model.compile(optimizer=tf.train.MomentumOptimizer(learning_rate=lr, momentum=0.9),
-    model.compile(optimizer=SGD(lr=lr, momentum=0.9),
+    # model.compile(optimizer=SGD(lr=lr, momentum=0.9),
+    model.compile(optimizer=tf.train.MomentumOptimizer(learning_rate=lr, momentum=0.9),
                   loss={'policy_head': categorical_crossentropy, 'value_head': 'mse'},
                   metrics={'policy_head': categorical_accuracy, 'value_head': binary_accuracy})
 
