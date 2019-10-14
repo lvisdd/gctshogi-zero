@@ -12,7 +12,7 @@ from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.layers import Input, Activation, Flatten
 from tensorflow.keras.layers import Layer
 from tensorflow.keras.models import load_model, model_from_json
-from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping, LearningRateScheduler, ModelCheckpoint
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.optimizers import SGD
 
@@ -74,10 +74,20 @@ def compile(model, lr, weight_decay):
                   loss={'policy_head': categorical_crossentropy, 'value_head': 'mse'},
                   metrics={'policy_head': categorical_accuracy, 'value_head': binary_accuracy})
 
-def train(positions_train, positions_test, model, batchsize, steps, test_steps, window_size):
+def train(positions_train, positions_test, model, checkpoint_path, batchsize, steps, test_steps, window_size):
+    earlystopping = EarlyStopping(monitor='val_loss', patience=2, verbose=1, mode='auto')
+    callbacks = [earlystopping,
+                 ModelCheckpoint(checkpoint_path,
+                                monitor='val_loss',
+                                verbose=1,
+                                save_best_only=True,
+                                save_weights_only=False,
+                                mode='min',
+                                period=1)]
+
     # model.fit_generator(datagen(positions_train), steps,
     #           validation_data=datagen(positions_test), validation_steps=test_steps)
-    model.fit_generator(datagen(positions_train), int(len(positions_train) / batchsize),
+    model.fit_generator(datagen(positions_train), int(len(positions_train) / batchsize), callbacks=callbacks,
               validation_data=datagen(positions_test), validation_steps=int(len(positions_test) / batchsize))
 
 if __name__ == '__main__':
@@ -122,11 +132,12 @@ if __name__ == '__main__':
         train(positions_train,
               positions_test,
               model,
+              args.model,
               args.batchsize,
               args.steps,
               args.test_steps,
               args.window_size
               )
 
-        model.save(args.model)
+        # model.save(args.model)
         positions_train.clear()
