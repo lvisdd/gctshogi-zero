@@ -73,7 +73,7 @@ def read_kifu_from_hcpe(hcpe_path, split_num=0):
         cboard.set_hcp(hcpes[i]['hcp'])
         
         sfen = cboard.sfen()
-        board = shogi.Board(sfen=sfen.decode('utf-8'))
+        board = shogi.Board(sfen=sfen)
         if board.turn == shogi.BLACK:
             # piece_bb = copy.deepcopy(board.piece_bb)
             # occupied = copy.deepcopy((board.occupied[shogi.BLACK], board.occupied[shogi.WHITE]))
@@ -90,7 +90,7 @@ def read_kifu_from_hcpe(hcpe_path, split_num=0):
         
         # move label
         move = hcpes[i]['bestMove16']
-        move_label = make_output_label(shogi.Move.from_usi(move_to_usi(move).decode('utf-8')), board.turn)
+        move_label = make_output_label(shogi.Move.from_usi(move_to_usi(move)), board.turn)
         
         # result
         gameResult = hcpes[i]['gameResult']
